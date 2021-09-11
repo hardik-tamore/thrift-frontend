@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const bodyParser = require("body-parser");
-const csvtojsonV2=require("csvtojson");
 var cors = require('cors')
 app.use(cors())
 
