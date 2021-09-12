@@ -12,10 +12,11 @@ const ProductSchema = mongoose.Schema({
     Chest : Number,
     Length : Number,
     Shoulder : Number,
-    photo :String
+    photo :String,
+    
 
-
-})
+}, { timestamps: true }
+)
 
 const Product = mongoose.model('Product', ProductSchema);
 

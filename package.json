@@ -14,9 +14,11 @@
     "csvtojson": "^2.0.10",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
     "mongoose": "^5.13.6",
     "multer": "^1.4.3",
     "nodemon": "^2.0.12",
+    "sharp": "^0.29.1",
     "uuid": "^8.3.2",
     "xls-to-json": "^2.1.0",
     "xlsx-to-json": "^0.3.0"

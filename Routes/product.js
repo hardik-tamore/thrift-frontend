@@ -5,6 +5,8 @@ let path = require('path');
 const router = express.Router();
 const Product = require('../Models/product')
 var cors = require('cors')
+const sharp = require('sharp')
+const fs = require('fs')
 
 
 router.get('/',async(req, res)=>{
@@ -79,27 +81,36 @@ router.patch("/:id", async (req, res) => {
 
 
 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, 'uploads');
-    },
+const storage = multer.memoryStorage({
     filename: function(req, file, cb) {   
         cb(null, uuidv4() + '-' + Date.now() + path.extname(file.originalname));
     }
 });
 
-const fileFilter = (req, file, cb) => {
-    const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    if(allowedFileTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(null, false);
-    }
-}
+// const fileFilter = (req, file, cb) => {
+//     const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+//     if(allowedFileTypes.includes(file.mimetype)) {
+//         cb(null, true);
+//     } else {
+//         cb(null, false);
+//     }
+// }
+// let upload = multer({ storage, fileFilter });
+// const storage = multer.memoryStorage();
+let upload = multer({storage})
 
-let upload = multer({ storage, fileFilter });
-router.route('/add').post(upload.single('photo'), (req, res, next) => {
- 
+
+router.post('/add',upload.single('photo'), async(req, res) => {
+    fs.access('./uploads', err=>{
+        if(err){
+            fs.mkdirSync('./uploads')
+        }
+    })
+    
+   await sharp(req.file.buffer).resize({ width: 200,
+    height: 200,
+    fit: sharp.fit.cover,
+    position: sharp.strategy.entropy}).withMetadata().toFile('./uploads/'+ req.file.originalname);
     const file = req.file;
       
         if (!file) {
@@ -111,6 +122,7 @@ router.route('/add').post(upload.single('photo'), (req, res, next) => {
  
         Name : req.body.Name,
         Status : "New",
+
        Price : req.body.Price,
        Cost : req.body.Cost,
        Size: req.body.Size,
@@ -118,14 +130,13 @@ router.route('/add').post(upload.single('photo'), (req, res, next) => {
        Condition_desc : req.body.Condition_desc,
        Chest : req.body.Chest,
        Length : req.body.Length,
-       Shoulder : req.body.Shoulder,
-      photo : file.filename
+       Shoulder : req.body.Shoulder==null?0:req.body.Shoulder,
+      photo :req.file.originalname
    });
 console.log(newProduct)
-   newProduct.save()
-           .then(() => res.json('User Added'))
-           .catch(err => {res.status(400).json('Error: ' + err); 
-        console.log(err)});
+   const r = newProduct.save()
+   res.send(r)
+           
 });
 
 
