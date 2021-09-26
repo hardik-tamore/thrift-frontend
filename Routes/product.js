@@ -135,51 +135,58 @@ router.post('/add',upload.single('photo'), async(req, res, next) => {
         if (!req.file) {
          console.log("no file")
         }
-        console.log(req.file.filename ) 
-       
-            const response = await drive.files.create({
-                requestBody : {
-                    name : req.file.filename ,
-                    mimeType : req.file.mimetype
-                },
-                media : {
-                    mimeType :  req.file.mimetype,
-                    body : fs.createReadStream(req.file.path)
-                }
-            })
-            console.log(response.data)
+        // console.log(req.file.filename ) 
+       try{
+        const response = await drive.files.create({
+            requestBody : {
+                name : req.file.filename ,
+                mimeType : req.file.mimetype
+            },
+            media : {
+                mimeType :  req.file.mimetype,
+                body : fs.createReadStream(req.file.path)
+            }
+        })
+        console.log(response.data)
 
-            const t = await drive.permissions.create({
-                fileId : response.data.id,
-                requestBody : {
-                    role : 'reader',
-                    type : 'anyone'
-        
-                }
-            })
-            // const result = await drive.files.get({
-            //     fileId : '1XZVXWBLIC12nircI4hsZOwM0I_fMqesG',
-            //     fields : 'webViewLink, webContentLink'
-            // })
-        console.log(t.data)
-    const newProduct = new Product({
+        const t = await drive.permissions.create({
+            fileId : response.data.id,
+            requestBody : {
+                role : 'reader',
+                type : 'anyone'
+    
+            }
+        })
+        // const result = await drive.files.get({
+        //     fileId : '1XZVXWBLIC12nircI4hsZOwM0I_fMqesG',
+        //     fields : 'webViewLink, webContentLink'
+        // })
+    console.log(t.data)
+       }
+       catch{
+           console.log("failed to upload to drive")
+       }
+            finally{
+                const newProduct = new Product({
  
-        Name : req.body.Name,
-        Status : "New",
-
-       Price : req.body.Price,
-       Cost : req.body.Cost,
-       Size: req.body.Size,
-       Condition : req.body.Condition,
-       Condition_desc : req.body.Condition_desc,
-       Chest : req.body.Chest,
-       Length : req.body.Length,
-       Shoulder : req.body.Shoulder==null?0:req.body.Shoulder,
-      photo :req.file.originalname
-   });
-console.log(newProduct)
-   const r = newProduct.save()
-   res.send(r)
+                    Name : req.body.Name,
+                    Status : "New",
+            
+                   Price : req.body.Price,
+                   Cost : req.body.Cost,
+                   Size: req.body.Size,
+                   Condition : req.body.Condition,
+                   Condition_desc : req.body.Condition_desc,
+                   Chest : req.body.Chest,
+                   Length : req.body.Length,
+                   Shoulder : req.body.Shoulder==null?0:req.body.Shoulder,
+                  photo :req.file.originalname
+               });
+            console.log(newProduct)
+               const r = newProduct.save()
+               res.send(r)
+            }
+   
            
 });
 
