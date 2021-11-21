@@ -9,7 +9,7 @@ const {google} = require('googleapis')
 const CLIENT_ID = '950238006168-cnncgb4m4b101r1vusjbh4aoh0ndsoeo.apps.googleusercontent.com'
 const CLIENT_SECRET ='99PLsfa00rHIU3HQ5xFFKfyV'
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground'
-const REFRESH_TOKEN = '1//04Ue9NYc6akG8CgYIARAAGAQSNwF-L9Ir_T9BjW66scSaQIwzm7eKlSX3vx75CdUoawHNb2_2vIphf5QIdpGM278JyIRimsKduwQ'
+const REFRESH_TOKEN = '1//04_7MU9CQ-KEKCgYIARAAGAQSNwF-L9IrTdsd8YrhJTrsGpuaj0_Ie35wMGcpElUTJt5AucY6RDNWRw1fQF0mgao4Orw-T8ibvZc'
 
 const oauth2Client = new google.auth.OAuth2(
     CLIENT_ID,
@@ -46,14 +46,20 @@ router.get('/:id',async(req, res)=>{
 
 
 router.patch('/user/:id', async (req, res) => {
+    console.log(req.body.data)
 	try {
 		const product = await Product.findOne({ _id: req.params.id })
-
-		if (req.body.Status) {
 			product.Status = 'Sold'
-		}
-        if(req.body.name)
-
+		
+        console.log(req.body.name);
+        product.customer.name =  req.body.name;
+        product.customer.user_name =  req.body.username? req.body.username : null;
+        product.customer.phone =  req.body.phone? req.body.phone : null;
+        product.customer.email =  req.body.email? req.body.email : null;
+        product.customer.address_1 =  req.body.address? req.body.address : null;
+        //product.customer.address_2 =  req.body.address_2? req.body.address_2 : null;
+        product.customer.pincode =  req.body.pincode? req.body.pincode : null;
+        product.customer.payment_mode =  req.body.paymentmode? req.body.paymentmode : null;
 	
 
 		await product.save()
@@ -163,8 +169,8 @@ router.post('/add',upload.single('photo'), async(req, res, next) => {
         // })
     console.log(t.data)
        }
-       catch{
-           console.log("failed to upload to drive")
+       catch (e) {
+           console.log(e)
        }
             finally{
                 const newProduct = new Product({
